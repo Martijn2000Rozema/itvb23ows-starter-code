@@ -1,0 +1,62 @@
+services:
+  database:
+    build: ./database/
+    environment:
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_DATABASE: hive
+    volumes:
+      - sql-data:/var/lib/mysql
+    networks:
+      hive-network:
+        aliases:
+          - mysql-hive-db
+
+  webserver:
+    build: ./frontend/
+    depends_on:
+      - database
+    command: php -S 0.0.0.0:80
+    ports:
+      - "80:80"
+    networks:
+      - hive-network
+
+  jenkins:
+    build: ./jenkins/
+    ports:
+      - "8080:8080"
+    environment:
+      JENKINS_ADMIN_ID: "root"
+      JENKINS_ADMIN_PASSWORD: "root"
+      JENKINS_PORT: 8080
+    volumes:
+      - jenkins-data:/var/jenkins_home
+    networks:
+      - hive-network
+
+  sonarqube:
+    build: ./sonarqube/
+    volumes:
+      - C:/Users/marti/IdeaProjects/OWS416423/itvb23ows-starter-code:/usr/src
+    networks:
+      hive-network:
+        aliases:
+          - sonarqube-server
+    ports:
+      - "9000:9000"
+
+  ai:
+    build: ./ai/
+    command: flask --app app run --debug
+    networks:
+      hive-network:
+        aliases:
+          - hiveai
+
+volumes:
+  sql-data:
+  jenkins-data:
+
+networks:
+  hive-network:

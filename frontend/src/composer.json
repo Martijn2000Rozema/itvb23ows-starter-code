@@ -1,0 +1,11 @@
+{
+  "name": "martijn/rozema",
+  "autoload": {
+    "psr-4": {
+      "Classes\\": "./classes"
+    }
+  },
+  "require": {
+    "phpunit/phpunit": "^9.0"
+  }
+}
